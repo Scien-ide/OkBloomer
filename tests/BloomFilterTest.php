@@ -35,4 +35,16 @@ class BloomFilterTest extends TestCase
 
         $this->assertTrue($this->filter->exists('foo'));
     }
+
+    /**
+     * @test
+     */
+    public function insert() : void
+    {
+        $this->assertFalse($this->filter->exists('foo'));
+
+        $this->filter->insert('foo');
+
+        $this->assertTrue($this->filter->exists('foo'));
+    }
 }

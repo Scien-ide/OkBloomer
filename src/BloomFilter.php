@@ -2,7 +2,7 @@
 
 namespace OkBloomer;
 
-use InvalidArgumentException;
+use OkBloomer\Exceptions\InvalidArgumentException;
 
 use function count;
 use function crc32;
@@ -79,7 +79,7 @@ class BloomFilter
      * @param float $maxFalsePositiveRate
      * @param int $numHashes
      * @param int $layerSize
-     * @throws \InvalidArgumentException
+     * @throws \OkBloomer\Exceptions\InvalidArgumentException
      */
     public function __construct(float $maxFalsePositiveRate, ?int $numHashes, int $layerSize)
     {
@@ -168,13 +168,23 @@ class BloomFilter
     }
 
     /**
-     * Return the proportion of bits that are unset.
+     * Return the proportion of bits that are set.
+     *
+     * @return float
+     */
+    public function utilization() : float
+    {
+        return $this->n / $this->size();
+    }
+
+    /**
+     * Return the proportion of bits that are not set.
      *
      * @return float
      */
     public function capacity() : float
     {
-        return 1.0 - ($this->n / $this->size());
+        return 1.0 - $this->utilization();
     }
 
     /**
@@ -266,6 +276,37 @@ class BloomFilter
         }
 
         return $exists;
+    }
+
+    /**
+     * Insert an element into the Bloom filter.
+     *
+     * @param string $token
+     */
+    public function insert(string $token) : void
+    {
+        $hashes = $this->hashes($token);
+
+        /** @var \OkBloomer\BooleanArray $layer */
+        $layer = end($this->layers);
+
+        $changed = false;
+
+        foreach ($hashes as $hash) {
+            if (!$layer[$hash]) {
+                $layer[$hash] = true;
+
+                ++$this->n;
+
+                $changed = true;
+            }
+        }
+
+        if ($changed) {
+            if ($this->falsePositiveRate() > $this->maxFalsePositiveRate) {
+                $this->layers[] = new BooleanArray($this->layerSize);
+            }
+        }
     }
 
     /**

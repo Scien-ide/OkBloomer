@@ -2,7 +2,7 @@
 
 namespace OkBloomer;
 
-use InvalidArgumentException;
+use OkBloomer\Exceptions\InvalidArgumentException;
 use ArrayAccess;
 use Countable;
 
@@ -49,7 +49,7 @@ class BooleanArray implements ArrayAccess, Countable
 
     /**
      * @param int $size
-     * @throws \InvalidArgumentException
+     * @throws \OkBloomer\Exceptions\InvalidArgumentException
      */
     public function __construct(int $size)
     {
@@ -67,7 +67,7 @@ class BooleanArray implements ArrayAccess, Countable
     /**
      * @param int $offset
      * @param bool $value
-     * @throws \InvalidArgumentException
+     * @throws \OkBloomer\Exceptions\InvalidArgumentException
      */
     public function offsetSet($offset, $value) : void
     {
@@ -109,7 +109,7 @@ class BooleanArray implements ArrayAccess, Countable
      * Return a row from the dataset at the given offset.
      *
      * @param int $offset
-     * @throws \InvalidArgumentException
+     * @throws \OkBloomer\Exceptions\InvalidArgumentException
      * @return bool
      */
     public function offsetGet($offset) : bool
