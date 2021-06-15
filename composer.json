@@ -1,0 +1,51 @@
+{
+    "name": "scienide/okbloomer",
+    "type": "library",
+    "description": "Autoscaling Bloom filter with ultra low memory usage for PHP.",
+    "license": "MIT",
+    "readme": "README.md",
+    "keywords": [
+        "bloom filter"
+    ],
+    "authors": [
+        {
+            "name": "Andrew DalPino",
+            "role": "Lead Developer",
+            "homepage": "https://github.com/andrewdalpino",
+            "email": "support@andrewdalpino.com"
+        }
+    ],
+    "require-dev": {
+        "phpstan/phpstan": "^0.12.88",
+        "phpunit/phpunit": "^9.5",
+        "phpbench/phpbench": "^1.0",
+        "friendsofphp/php-cs-fixer": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "OkBloomer\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "OkBloomer\\Benchmarks\\": "benchmarks/",
+            "OkBloomer\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "analyze": "phpstan analyse -c phpstan.neon",
+        "benchmark": "phpbench run --report=aggregate",
+        "build": [
+            "@composer install",
+            "@analyze",
+            "@test",
+            "@check"
+        ],
+        "check": [
+            "@putenv PHP_CS_FIXER_IGNORE_ENV=1",
+            "php-cs-fixer fix --config=.php_cs.dist.php -v --dry-run --using-cache=no"
+        ],
+        "fix": "php-cs-fixer fix --config=.php_cs.dist.php",
+        "test": "phpunit"
+    }
+}
