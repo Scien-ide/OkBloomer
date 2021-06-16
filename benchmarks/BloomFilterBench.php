@@ -7,7 +7,7 @@ use OkBloomer\BloomFilter;
 /**
  * @BeforeMethods({"setUp"})
  */
-class BloomFiltersBench
+class BloomFilterBench
 {
     private const NUM_TOKENS = 100000;
 

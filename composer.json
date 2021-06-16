@@ -5,7 +5,7 @@
     "license": "MIT",
     "readme": "README.md",
     "keywords": [
-        "bloom filter"
+        "bloom filter", "scalable bloom filter", "layered bloom filter"
     ],
     "authors": [
         {
