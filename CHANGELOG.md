@@ -1,3 +1,5 @@
-- 0.0.0-beta1
+- 1.0.0
+    - Implemented Bloom Filter
+    - Added Boolean Array
     - Added `insert` method
     - Simplify false positive rate calculation

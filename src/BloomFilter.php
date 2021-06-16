@@ -68,7 +68,14 @@ class BloomFilter
     protected array $layers;
 
     /**
-     * The number of items in the Bloom filter.
+     * The size of the filter in bits.
+     *
+     * @var int
+     */
+    protected int $m;
+
+    /**
+     * The number of items in the filter.
      *
      * @var int
      */
@@ -81,7 +88,7 @@ class BloomFilter
      * @throws \OkBloomer\Exceptions\InvalidArgumentException
      */
     public function __construct(
-        float $maxFalsePositiveRate = 0.001,
+        float $maxFalsePositiveRate = 0.01,
         ?int $numHashes = 4,
         int $layerSize = 32000000
     ) {
@@ -117,6 +124,7 @@ class BloomFilter
         $this->layerSize = $layerSize;
         $this->sliceSize = $sliceSize;
         $this->layers = [new BooleanArray($layerSize)];
+        $this->m = $layerSize;
     }
 
     /**
@@ -176,7 +184,7 @@ class BloomFilter
      */
     public function size() : int
     {
-        return $this->numLayers() * $this->layerSize;
+        return $this->m;
     }
 
     /**
@@ -196,7 +204,7 @@ class BloomFilter
      */
     public function utilization() : float
     {
-        return $this->n / $this->size();
+        return $this->n / $this->m;
     }
 
     /**
@@ -245,7 +253,7 @@ class BloomFilter
 
         if ($changed) {
             if ($this->falsePositiveRate() > $this->maxFalsePositiveRate) {
-                $this->layers[] = new BooleanArray($this->layerSize);
+                $this->addLayer();
             }
         }
     }
@@ -291,7 +299,7 @@ class BloomFilter
 
         if (!$exists) {
             if ($this->falsePositiveRate() > $this->maxFalsePositiveRate) {
-                $this->layers[] = new BooleanArray($this->layerSize);
+                $this->addLayer();
             }
         }
 
@@ -319,6 +327,16 @@ class BloomFilter
         }
 
         return false;
+    }
+
+    /**
+     * Add a layer to the filter.
+     */
+    protected function addLayer() : void
+    {
+        $this->layers[] = new BooleanArray($this->layerSize);
+
+        $this->m += $this->layerSize;
     }
 
     /**
