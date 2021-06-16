@@ -9,7 +9,6 @@ use function crc32;
 use function round;
 use function max;
 use function log;
-use function exp;
 use function end;
 
 /**
@@ -217,30 +216,38 @@ class BloomFilter
      */
     public function falsePositiveRate() : float
     {
-        return (1.0 - exp(-(($this->numHashes * $this->n) / $this->size()))) ** $this->numHashes;
+        return $this->utilization() ** $this->numHashes;
     }
 
     /**
-     * Does a token exist in the filter?
+     * Insert an element into the filter.
      *
      * @param string $token
-     * @return bool
      */
-    public function exists(string $token) : bool
+    public function insert(string $token) : void
     {
         $hashes = $this->hashes($token);
 
-        foreach ($this->layers as $layer) {
-            foreach ($hashes as $hash) {
-                if (!$layer[$hash]) {
-                    continue 2;
-                }
-            }
+        /** @var \OkBloomer\BooleanArray $layer */
+        $layer = end($this->layers);
 
-            return true;
+        $changed = false;
+
+        foreach ($hashes as $hash) {
+            if (!$layer[$hash]) {
+                $layer[$hash] = true;
+
+                ++$this->n;
+
+                $changed = true;
+            }
         }
 
-        return false;
+        if ($changed) {
+            if ($this->falsePositiveRate() > $this->maxFalsePositiveRate) {
+                $this->layers[] = new BooleanArray($this->layerSize);
+            }
+        }
     }
 
     /**
@@ -292,38 +299,30 @@ class BloomFilter
     }
 
     /**
-     * Insert an element into the Bloom filter.
+     * Does a token exist in the filter?
      *
      * @param string $token
+     * @return bool
      */
-    public function insert(string $token) : void
+    public function exists(string $token) : bool
     {
         $hashes = $this->hashes($token);
 
-        /** @var \OkBloomer\BooleanArray $layer */
-        $layer = end($this->layers);
-
-        $changed = false;
-
-        foreach ($hashes as $hash) {
-            if (!$layer[$hash]) {
-                $layer[$hash] = true;
-
-                ++$this->n;
-
-                $changed = true;
+        foreach ($this->layers as $layer) {
+            foreach ($hashes as $hash) {
+                if (!$layer[$hash]) {
+                    continue 2;
+                }
             }
+
+            return true;
         }
 
-        if ($changed) {
-            if ($this->falsePositiveRate() > $this->maxFalsePositiveRate) {
-                $this->layers[] = new BooleanArray($this->layerSize);
-            }
-        }
+        return false;
     }
 
     /**
-     * Return an array of hashes from a given string.
+     * Return an array of hashes from a given token.
      *
      * @param string $token
      * @return list<int>

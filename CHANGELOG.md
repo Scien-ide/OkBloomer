@@ -1,2 +1,3 @@
 - 0.0.0-beta1
     - Added `insert` method
+    - Simplify false positive rate calculation

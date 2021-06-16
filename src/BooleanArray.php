@@ -14,7 +14,7 @@ use function str_repeat;
 /**
  * Boolean Array
  *
- * A fixed array data structure that efficiently stores boolean values.
+ * A fixed array data structure that efficiently stores boolean values as bits of a byte array.
  *
  * @internal
  *
@@ -34,18 +34,18 @@ class BooleanArray implements ArrayAccess, Countable
     protected const ONE_BYTE = 8;
 
     /**
-     * A byte array storing the bits of a bitmap.
-     *
-     * @var string
-     */
-    protected string $bitmap;
-
-    /**
      * The number of elements in the array.
      *
      * @var int
      */
     protected int $size;
+
+    /**
+     * A byte array (string) containing the bits of the bitmap.
+     *
+     * @var string
+     */
+    protected string $bitmap;
 
     /**
      * @param int $size
@@ -65,6 +65,16 @@ class BooleanArray implements ArrayAccess, Countable
     }
 
     /**
+     * Return the size of the boolean array.
+     *
+     * @return int
+     */
+    public function size() : int
+    {
+        return $this->size;
+    }
+
+    /**
      * @param int $offset
      * @param bool $value
      * @throws \OkBloomer\Exceptions\InvalidArgumentException
@@ -72,10 +82,10 @@ class BooleanArray implements ArrayAccess, Countable
     public function offsetSet($offset, $value) : void
     {
         if (!$this->offsetExists($offset)) {
-            throw new InvalidArgumentException("Element at offset $offset not found.");
+            throw new InvalidArgumentException("Item at offset $offset not found.");
         }
 
-        $byteOffset = (int) ($offset / self::ONE_BYTE);
+        $byteOffset = intdiv($offset, self::ONE_BYTE);
 
         $byte = ord($this->bitmap[$byteOffset]);
 
@@ -98,11 +108,11 @@ class BooleanArray implements ArrayAccess, Countable
      */
     public function offsetExists($offset) : bool
     {
-        if ($offset >= 0 or $offset < $this->size) {
-            return true;
+        if ($offset < 0 or $offset >= $this->size) {
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -115,10 +125,10 @@ class BooleanArray implements ArrayAccess, Countable
     public function offsetGet($offset) : bool
     {
         if (!$this->offsetExists($offset)) {
-            throw new InvalidArgumentException("Element at offset $offset not found.");
+            throw new InvalidArgumentException("Item at offset $offset not found.");
         }
 
-        $byteOffset = (int) ($offset / self::ONE_BYTE);
+        $byteOffset = intdiv($offset, self::ONE_BYTE);
 
         $byte = ord($this->bitmap[$byteOffset]);
 
