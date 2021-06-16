@@ -1,11 +1,9 @@
 # Ok Bloomer
-Autoscaling Bloom filter with ultra low memory usage for PHP. Ok Bloomer, employs a layering strategy that allows it to grow as more items are added to the filter while maintaining an upper bound on the false positive rate.
+An autoscaling Bloom filter with ultra-low memory footprint for PHP. Ok Bloomer employs a layered filtering strategy that allows it to expand while maintaining an upper bound on the false positive rate. Each layer is comprised of a bitmap that remembers the hash signatures of the items inserted so far. If an item gets caught in the filter, then there is a small chance that the item was never seen before (a false positive). However, if an item passes through the filter, then it definitely has never been seen before. Bloom filters find many uses in caching systems, stream deduplication, [DNA sequence counting](https://github.com/Scien-ide/DNAHash), and many more.
 
-- Ultra low memory footprint
-- Works on streaming data
-- Open-source and free to use commercially
-
-> **Note:** Due to the probabilistic nature of the Bloom filter, it may report false positives at a bounded rate.
+- **Ultra-low** memory footprint
+- **Autoscaling** works on streaming data
+- **Open-source** and free to use commercially
 
 ## Installation
 Install into your project using [Composer](https://getcomposer.org/):
@@ -17,20 +15,36 @@ $ composer require scienide/okbloomer
 ### Requirements
 - [PHP](https://php.net/manual/en/install.php) 7.4 or above
 
-## Example Usage
+## Bloom Filter
+A probabilistic data structure that estimates the prior occurrence of a given item with a maximum false positive rate.
+
+### Parameters
+| # | Name | Default | Type | Description |
+|---|---|---|---|---|
+| 1 | maxFalsePositiveRate | 0.001 | float | The false positive rate to remain below. |
+| 2 | numHashes | 4 | int|null | The number of hash functions used, i.e. the number of slices per layer. Set to `null` for auto. |
+| 3 | layerSize | 32000000 | int | The size of each layer of the filter in bits. |
+
+### Example
 
 ```php
 use OkBloomer\BloomFilter;
 
 $filter = new BloomFilter(0.001, 4);
 
-echo $filter->existsOrInsert('foo');
+$filter->insert('foo');
 
 echo $filter->exists('foo');
+
+echo $filter->existsOrInsert('bar');
+
+echo $filter->exists('bar');
 ```
 
 ```
-false 
+true 
+
+false
 
 true
 ```

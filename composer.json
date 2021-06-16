@@ -1,7 +1,7 @@
 {
     "name": "scienide/okbloomer",
     "type": "library",
-    "description": "Autoscaling Bloom filter with ultra low memory usage for PHP.",
+    "description": "An autoscaling Bloom filter with ultra-low memory usage for PHP.",
     "license": "MIT",
     "readme": "README.md",
     "keywords": [
@@ -20,6 +20,8 @@
     },
     "require-dev": {
         "phpstan/phpstan": "^0.12.88",
+        "phpstan/phpstan-phpunit": "0.12.*",
+        "phpstan/extension-installer": "^1.0",
         "phpunit/phpunit": "^9.5",
         "phpbench/phpbench": "^1.0",
         "friendsofphp/php-cs-fixer": "^3.0"
@@ -50,5 +52,22 @@
         ],
         "fix": "php-cs-fixer fix --config=.php_cs.dist.php",
         "test": "phpunit"
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "process-timeout": 3000
+    },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/andrewdalpino"
+        }
+    ],
+    "support": {
+        "docs": "https://github.com/Scien-ide/OkBloomer/README.md",
+        "issues": "https://github.com/Scien-ide/OkBloomer/issues",
+        "source": "https://github.com/Scien-ide/OkBloomer",
+        "email": "support@andrewdalpino.com"
     }
 }

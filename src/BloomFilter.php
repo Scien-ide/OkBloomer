@@ -15,7 +15,7 @@ use function end;
 /**
  * Bloom Filter
  *
- * A probabilistic data structure that estimates the prior occurrence of a given token.
+ * A probabilistic data structure that estimates the prior occurrence of a given item with a maximum false positive rate.
  *
  * References:
  * [1] P. S. Almeida et al. (2007). Scalable Bloom Filters.
@@ -34,14 +34,14 @@ class BloomFilter
     protected const MAX_32_BIT_INTEGER = 2147483647;
 
     /**
-     * The maximum false positive rate to maintain.
+     * The false positive rate to remain below.
      *
      * @var float
      */
     protected $maxFalsePositiveRate;
 
     /**
-     * The number of hash functions used in the filter.
+     * The number of hash functions used, i.e. the number of slices per layer.
      *
      * @var int
      */
@@ -69,7 +69,7 @@ class BloomFilter
     protected array $layers;
 
     /**
-     * The number of elements in the Bloom filter.
+     * The number of items in the Bloom filter.
      *
      * @var int
      */
@@ -77,12 +77,15 @@ class BloomFilter
 
     /**
      * @param float $maxFalsePositiveRate
-     * @param int $numHashes
+     * @param int|null $numHashes
      * @param int $layerSize
      * @throws \OkBloomer\Exceptions\InvalidArgumentException
      */
-    public function __construct(float $maxFalsePositiveRate, ?int $numHashes, int $layerSize)
-    {
+    public function __construct(
+        float $maxFalsePositiveRate = 0.001,
+        ?int $numHashes = 4,
+        int $layerSize = 32000000
+    ) {
         if ($maxFalsePositiveRate < 0.0 or $maxFalsePositiveRate > 1.0) {
             throw new InvalidArgumentException('Max false positive rate'
                 . "  must be between 0 and 1, $maxFalsePositiveRate given.");
@@ -97,18 +100,18 @@ class BloomFilter
             $numHashes = max(1, (int) log(1.0 / $maxFalsePositiveRate, 2));
         }
 
-        if ($layerSize > self::MAX_32_BIT_INTEGER) {
-            throw new InvalidArgumentException('Layer size must be'
-                . ' less than ' . self::MAX_32_BIT_INTEGER
-                . ", $layerSize given.");
-        }
-
         if ($layerSize < $numHashes) {
             throw new InvalidArgumentException('Layer size must be'
                 . " greater than $numHashes, $layerSize given.");
         }
 
         $sliceSize = (int) round($layerSize / $numHashes);
+
+        if ($sliceSize > self::MAX_32_BIT_INTEGER) {
+            throw new InvalidArgumentException('Layer slice size'
+                . ' must be less than ' . self::MAX_32_BIT_INTEGER
+                . ", $sliceSize given.");
+        }
 
         $this->maxFalsePositiveRate = $maxFalsePositiveRate;
         $this->numHashes = $numHashes;
@@ -138,13 +141,23 @@ class BloomFilter
     }
 
     /**
-     * Return the size of each bitmap.
+     * Return the size of each layer of the filter.
      *
      * @return int
      */
     public function layerSize() : int
     {
         return $this->layerSize;
+    }
+
+    /**
+     * Return the size of a slice of a layer in bits.
+     *
+     * @return int
+     */
+    public function sliceSize() : int
+    {
+        return $this->sliceSize;
     }
 
     /**
@@ -168,6 +181,16 @@ class BloomFilter
     }
 
     /**
+     * Return the number of bits that are set in the filter.
+     *
+     * @return int
+     */
+    public function n() : int
+    {
+        return $this->n;
+    }
+
+    /**
      * Return the proportion of bits that are set.
      *
      * @return float
@@ -185,16 +208,6 @@ class BloomFilter
     public function capacity() : float
     {
         return 1.0 - $this->utilization();
-    }
-
-    /**
-     * Return the number of bits that are set in the filter.
-     *
-     * @return int
-     */
-    public function n() : int
-    {
-        return $this->n;
     }
 
     /**
