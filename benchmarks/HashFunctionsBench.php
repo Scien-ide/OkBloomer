@@ -7,45 +7,41 @@ namespace OkBloomer\Benchmarks;
  */
 class HashFunctionsBench
 {
-    private const BASES = [
-        'A', 'C', 'G', 'T',
-    ];
+    private const NUM_TOKENS = 10000;
 
-    private const NUM_SEQUENCES = 10000;
-
-    private const K = 25;
+    private const TOKEN_LENGTH = 25;
 
     /**
      * @var list<string>
      */
-    protected $sequences;
+    protected $tokens;
 
     /**
-     * Generate a k-mer of length k.
+     * Generate a token of length k.
      *
      * @param int $k
      * @return string
      */
-    private static function generateKmer(int $k) : string
+    private static function generateToken(int $k) : string
     {
-        $sequence = '';
+        $token = '';
 
         for ($i = 0; $i < $k; ++$i) {
-            $sequence .= self::BASES[rand(0, 3)];
+            $token .= chr(rand(0, 254));
         }
 
-        return $sequence;
+        return $token;
     }
 
     public function setUp() : void
     {
-        $sequences = [];
+        $tokens = [];
 
-        for ($i = 0; $i < self::NUM_SEQUENCES; ++$i) {
-            $sequences[] = self::generateKmer(self::K);
+        for ($i = 0; $i < self::NUM_TOKENS; ++$i) {
+            $tokens[] = self::generateToken(self::TOKEN_LENGTH);
         }
 
-        $this->sequences = $sequences;
+        $this->tokens = $tokens;
     }
 
     /**
@@ -56,8 +52,8 @@ class HashFunctionsBench
      */
     public function adler32() : void
     {
-        foreach ($this->sequences as $sequence) {
-            $digest = hash('adler32', $sequence);
+        foreach ($this->tokens as $token) {
+            $digest = hash('adler32', $token);
         }
     }
 
@@ -69,8 +65,8 @@ class HashFunctionsBench
      */
     public function crc32() : void
     {
-        foreach ($this->sequences as $sequence) {
-            $digest = crc32($sequence);
+        foreach ($this->tokens as $token) {
+            $digest = crc32($token);
         }
     }
 
@@ -82,8 +78,8 @@ class HashFunctionsBench
      */
     public function crc32b() : void
     {
-        foreach ($this->sequences as $sequence) {
-            $digest = hash('crc32b', $sequence);
+        foreach ($this->tokens as $token) {
+            $digest = hash('crc32b', $token);
         }
     }
 
@@ -95,8 +91,8 @@ class HashFunctionsBench
      */
     public function crc32c() : void
     {
-        foreach ($this->sequences as $sequence) {
-            $digest = hash('crc32c', $sequence);
+        foreach ($this->tokens as $token) {
+            $digest = hash('crc32c', $token);
         }
     }
 
@@ -108,8 +104,8 @@ class HashFunctionsBench
      */
     public function fnv132() : void
     {
-        foreach ($this->sequences as $sequence) {
-            $digest = hash('fnv132', $sequence);
+        foreach ($this->tokens as $token) {
+            $digest = hash('fnv132', $token);
         }
     }
 
@@ -121,8 +117,8 @@ class HashFunctionsBench
      */
     public function fnv1a32() : void
     {
-        foreach ($this->sequences as $sequence) {
-            $digest = hash('fnv1a32', $sequence);
+        foreach ($this->tokens as $token) {
+            $digest = hash('fnv1a32', $token);
         }
     }
 
@@ -134,8 +130,8 @@ class HashFunctionsBench
      */
     public function fnv164() : void
     {
-        foreach ($this->sequences as $sequence) {
-            $digest = hash('fnv164', $sequence);
+        foreach ($this->tokens as $token) {
+            $digest = hash('fnv164', $token);
         }
     }
 
@@ -147,8 +143,8 @@ class HashFunctionsBench
      */
     public function fnv1a64() : void
     {
-        foreach ($this->sequences as $sequence) {
-            $digest = hash('fnv1a64', $sequence);
+        foreach ($this->tokens as $token) {
+            $digest = hash('fnv1a64', $token);
         }
     }
 }

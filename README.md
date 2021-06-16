@@ -22,7 +22,7 @@ A probabilistic data structure that estimates the prior occurrence of a given it
 | # | Name | Default | Type | Description |
 |---|---|---|---|---|
 | 1 | maxFalsePositiveRate | 0.001 | float | The false positive rate to remain below. |
-| 2 | numHashes | 4 | int|null | The number of hash functions used, i.e. the number of slices per layer. Set to `null` for auto. |
+| 2 | numHashes | 4 | int, null | The number of hash functions used, i.e. the number of slices per layer. Set to `null` for auto. |
 | 3 | layerSize | 32000000 | int | The size of each layer of the filter in bits. |
 
 ### Example
