@@ -1,8 +1,9 @@
 # Ok Bloomer
-An autoscaling [Bloom filter](https://en.wikipedia.org/wiki/Bloom_filter) with ultra-low memory footprint for PHP. Ok Bloomer employs a layered filtering strategy that allows it to expand while maintaining an upper bound on the false positive rate. Each layer is comprised of a bitmap that remembers the hash signatures of the items inserted so far. If an item gets caught in the filter, then there is a small chance that the item was never seen before (a false positive). However, if an item passes through the filter, then it definitely has never been seen before. Bloom filters find many uses in caching systems, stream deduplication, [DNA sequence counting](https://github.com/Scien-ide/DNAHash), and many more.
+An autoscaling [Bloom filter](https://en.wikipedia.org/wiki/Bloom_filter) with ultra-low memory footprint for PHP. Ok Bloomer employs a layered filtering strategy that allows it to expand while maintaining an upper bound on the false positive rate. Each layer is comprised of a bitmap that remembers the hash signatures of the items inserted so far. If an item gets caught in the filter, then it has probably been seen before. However, if an item passes through the filter, then it definitely has never been seen before. Bloom filters find uses in caching systems, stream deduplication, [DNA sequence counting](https://github.com/Scien-ide/DNAHash), and many more.
 
 - **Ultra-low** memory footprint
 - **Autoscaling** works on streaming data
+- **Bounded** maximum false positive rate
 - **Open-source** and free to use commercially
 
 ## Installation
@@ -30,7 +31,7 @@ A probabilistic data structure that estimates the prior occurrence of a given it
 ```php
 use OkBloomer\BloomFilter;
 
-$filter = new BloomFilter(0.001, 4);
+$filter = new BloomFilter(0.01, 4, 32000000);
 
 $filter->insert('foo');
 
